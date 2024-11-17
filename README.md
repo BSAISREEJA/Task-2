@@ -27,5 +27,5 @@ formats.
 • Ensure website performance and reliability by optimizing loading times and handling errors
 gracefully.
 
-"C:\Users\sreek\OneDrive\Pictures\Screenshots\Screenshot 2024-11-17 233531.png"
+http://127.0.0.1:5500/Users/sreek/OneDrive/Documents/index1.html
 
