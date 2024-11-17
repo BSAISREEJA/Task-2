@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Weather Forecast Website">
+    <title>Weather Forecast</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- For charts -->
+</head>
+<body>
+    <header>
+        <h1>Weather Forecast</h1>
+        <div id="search-container">
+            <input type="text" id="location-input" placeholder="Enter location">
+            <button id="search-btn">Search</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Current Weather Section -->
+        <section id="current-weather">
+            <h2>Current Weather</h2>
+            <div id="weather-details">
+                <p>Temperature: <span id="temperature">--</span>°C</p>
+                <p>Humidity: <span id="humidity">--</span>%</p>
+                <p>Wind Speed: <span id="wind-speed">--</span> km/h</p>
+                <p>Pressure: <span id="pressure">--</span> hPa</p>
+            </div>
+        </section>
+
+        <!-- 5-Day Forecast Section -->
+        <section id="forecast">
+            <h2>5-Day Forecast</h2>
+            <canvas id="forecast-chart"></canvas>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Weather Forecast Website</p>
+    </footer>
+
+    <script>
+        const apiKey = "YOUR_API_KEY"; // Replace with your API key
+        const apiBaseUrl = "https://api.openweathermap.org/data/2.5/";
+
+        document.getElementById('search-btn').addEventListener('click', () => {
+            const location = document.getElementById('location-input').value;
+            if (location) {
+                fetchWeather(location);
+                fetchForecast(location);
+            } else {
+                alert("Please enter a location.");
+            }
+        });
+
+        function fetchWeather(location) {
+            fetch(`${apiBaseUrl}weather?q=${location}&appid=${apiKey}&units=metric`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('temperature').innerText = data.main.temp;
+                    document.getElementById('humidity').innerText = data.main.humidity;
+                    document.getElementById('wind-speed').innerText = data.wind.speed;
+                    document.getElementById('pressure').innerText = data.main.pressure;
+                })
+                .catch(error => alert("Error fetching weather data."));
+        }
+
+        function fetchForecast(location) {
+            fetch(`${apiBaseUrl}forecast?q=${location}&appid=${apiKey}&units=metric`)
+                .then(response => response.json())
+                .then(data => {
+                    const labels = [];
+                    const temps = [];
+
+                    data.list.forEach(item => {
+                        labels.push(new Date(item.dt_txt).toLocaleString());
+                        temps.push(item.main.temp);
+                    });
+
+                    createChart(labels, temps);
+                })
+                .catch(error => alert("Error fetching forecast data."));
+        }
+
+        function createChart(labels, data) {
+            const ctx = document.getElementById('forecast-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Temperature (°C)',
+                        data: data,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date and Time'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Temperature (°C)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
